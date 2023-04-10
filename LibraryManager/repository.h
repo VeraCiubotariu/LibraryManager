@@ -37,13 +37,13 @@ public:
 	/// </summary>
 	/// <param name="pos"> int </param>
 	/// <returns> Book </returns>
-	Book getBook(const int pos) const;
+	const Book& getBook(const int pos) const;
 
 	/// <summary>
 	/// Returns all the books from the list
 	/// </summary>
 	/// <returns> vector<Book> </returns>
-	const std::vector<Book> getAll() const;
+	std::vector<Book> getAll() const;
 };
 
 void testRepository();

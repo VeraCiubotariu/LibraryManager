@@ -24,6 +24,12 @@ public:
 	Book();
 
 	/// <summary>
+	/// Copy constructor
+	/// </summary>
+	/// <param name="book"></param>
+	Book(const Book& book);
+
+	/// <summary>
 	/// Verifies if the given book is equal to this book
 	/// </summary>
 	/// <param name="book"> Book </param>

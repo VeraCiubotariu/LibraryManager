@@ -1,6 +1,7 @@
 #include "book.h"
 #include <string>
 #include <assert.h>
+#include <iostream>
 
 Book::Book(const std::string& title, const std::string& author, const std::string& genre, const int year) {
 	this->title = title;
@@ -12,6 +13,15 @@ Book::Book(const std::string& title, const std::string& author, const std::strin
 Book::Book() {
 	this->title = this->author = this->genre = " ";
 	this->year = 0;
+}
+
+Book::Book(const Book& book) {
+	title = book.title;
+	author = book.author;
+	genre = book.genre;
+	year = book.year;
+
+	//std::cout << "copying...\n";
 }
 
 bool Book::operator==(const Book& book) const {

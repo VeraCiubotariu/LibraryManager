@@ -38,9 +38,34 @@ public:
 	void searchUI();
 
 	/// <summary>
+	/// Reads the input and filters the books by the year given
+	/// </summary>
+	void yearFilterUI();
+
+	/// <summary>
+	/// Reads the input and filters the books by the title given
+	/// </summary>
+	void titleFilterUI();
+
+	/// <summary>
+	/// Sorts the list of books by their titles and prints them
+	/// </summary>
+	void titleSortUI();
+
+	/// <summary>
+	/// Sorts the list of books by their authors and prints them
+	/// </summary>
+	void authorSortUI();
+
+	/// <summary>
+	/// Sorts the list of books by their year and then genre and prints them
+	/// </summary>
+	void yearGenreSortUI();
+
+	/// <summary>
 	/// Prints all the books
 	/// </summary>
-	void printAll();
+	void printAll(const std::vector<Book>& books);
 
 	/// <summary>
 	/// Runs the interface

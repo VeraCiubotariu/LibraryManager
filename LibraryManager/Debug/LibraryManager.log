@@ -1,2 +1,5 @@
 ﻿  main.cpp
+  presentation.cpp
+C:\OOP\LibraryManager\LibraryManager\presentation.cpp(37,20): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
   LibraryManager.vcxproj -> C:\OOP\LibraryManager\Debug\LibraryManager.exe

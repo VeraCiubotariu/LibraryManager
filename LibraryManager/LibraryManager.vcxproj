@@ -72,6 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <CodeAnalysisRuleSet>cpp_rules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -140,9 +141,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="book.h" />
+    <ClInclude Include="errors.h" />
     <ClInclude Include="presentation.h" />
     <ClInclude Include="repository.h" />
     <ClInclude Include="service.h" />
+    <ClInclude Include="validator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="book.cpp" />
@@ -150,6 +153,7 @@
     <ClCompile Include="presentation.cpp" />
     <ClCompile Include="repository.cpp" />
     <ClCompile Include="service.cpp" />
+    <ClCompile Include="validator.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

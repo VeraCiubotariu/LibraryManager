@@ -3,7 +3,7 @@
 #include <assert.h>
 
 void Repository::add(const Book& book) {
-	this->books.emplace_back(book);
+	this->books.push_back(book);
 }
 
 void Repository::modify(const int pos, const Book& newBook) {
@@ -22,14 +22,11 @@ int Repository::booksNumber() const {
 	return this->books.size();
 }
 
-Book Repository::getBook(const int pos) const {
+const Book& Repository::getBook(const int pos) const {
 	return this->books[pos];
 }
 
-const std::vector<Book> Repository::getAll() const {
-	//std::vector<Book> res;
-	//res = this->books;
-	//return res;
+std::vector<Book> Repository::getAll() const {
 	return this->books;
 }
 
@@ -61,6 +58,6 @@ void testRepository() {
 	assert(books.getBook(0) == b);
 
 	books.remove(0);
-	assert(books.booksNumber() == 0);
+	assert(books.booksNumber() == 0); 
 }
 

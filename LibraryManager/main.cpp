@@ -1,6 +1,9 @@
 #include "presentation.h"
+#include "validator.h"
 
 void runTests() {
+	testValidator();
+
 	testBook();
 	testRepository();
 
@@ -8,16 +11,19 @@ void runTests() {
 	testModify();
 	testRemove();
 	testSearch();
+	testFilters();
+	testSort();
 }
 
 int main() {
 	runTests();
 
 	Repository repo = Repository();
-	Service serv = Service(repo);
+	Validator val = Validator();
+	Service serv = Service(repo, val);
 	UI ui = UI(serv);
 
-	//ui.runUI();
+	ui.runUI();
 
 	return 0;
 }
