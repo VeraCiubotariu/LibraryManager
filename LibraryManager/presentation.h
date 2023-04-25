@@ -1,15 +1,17 @@
 #pragma once
 #include "service.h"
+#include "serviceBasket.h"
 
 class UI {
 private:
 	Service& serv;
+	ServiceBasket& basket;
 public:
 	/// <summary>
 	/// Constructor of the class
 	/// </summary>
 	/// <param name="serv"> Service </param>
-	UI(Service& serv) : serv{ serv } {
+	UI(Service& serv, ServiceBasket& servBasket) noexcept : serv{ serv }, basket{ servBasket } {
 	};
 
 	/// <summary>
@@ -63,9 +65,29 @@ public:
 	void yearGenreSortUI();
 
 	/// <summary>
+	/// Adds an item to the basket and prints the basket
+	/// </summary>
+	void addBasketUI();
+
+	/// <summary>
+	/// Clears the basket
+	/// </summary>
+	void clearBasketUI();
+
+	/// <summary>
+	/// Generates a random basket and prints it
+	/// </summary>
+	void generateBasketUI();
+
+	/// <summary>
+	/// Exports the current basket
+	/// </summary>
+	void exportBasketUI();
+
+	/// <summary>
 	/// Prints all the books
 	/// </summary>
-	void printAll(const std::vector<Book>& books);
+	void printAll(const vector<Book>& books);
 
 	/// <summary>
 	/// Runs the interface

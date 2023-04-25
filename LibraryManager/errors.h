@@ -10,7 +10,7 @@ public:
 		this->message = mess;
 	}
 
-	const std::string& getMessage() {
+	const std::string& getMessage() noexcept {
 		return message;
 	}
 };
@@ -19,6 +19,11 @@ class ValidationError: public StandardError {
 public:
 	ValidationError(std::string message) : StandardError(message) {
 	}
+};
+
+class RepositoryError :public StandardError {
+public:
+	RepositoryError(std::string message) : StandardError(message) {}
 };
 
 class ServiceError : public StandardError {

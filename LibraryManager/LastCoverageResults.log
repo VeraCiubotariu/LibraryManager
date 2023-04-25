@@ -1,4 +1,4 @@
-[2023-04-10 19:45:50] [info] Start Program:
+[2023-04-23 21:17:47] [info] Start Program:
 Path:"C:\\OOP\\LibraryManager\\Debug\\LibraryManager.exe"
 Arguments:
 Working directory: "C:\\OOP\\LibraryManager\\LibraryManager\\"
@@ -9,13 +9,13 @@ Cover Children: 0
 Aggregate by file: 1
 Continue after C++ exception: 0
 Optimized build support: 0
-Export: binary C:\Users\Senpai\AppData\Local\Temp\x5dx0o0z.wy0 
+Export: binary C:\Users\Senpai\AppData\Local\Temp\lsp2gsgx.lel 
 Input coverage: 
 Unified diff: 
 Excluded line regular expressions: 
 Substitute pdb source paths: 
 
-[2023-04-10 19:45:50] [info] Module: C:\OOP\LibraryManager\Debug\LibraryManager.exe is selected because it matches selected pattern: C:\OOP\LibraryManager\Debug\LibraryManager.exe
-[2023-04-10 19:45:51] [info] ----------------------------------------------------
-[2023-04-10 19:45:51] [info] Coverage binary generated in file: C:\Users\Senpai\AppData\Local\Temp\x5dx0o0z.wy0
-[2023-04-10 19:45:51] [info] ----------------------------------------------------
+[2023-04-23 21:17:47] [info] Module: C:\OOP\LibraryManager\Debug\LibraryManager.exe is selected because it matches selected pattern: C:\OOP\LibraryManager\Debug\LibraryManager.exe
+[2023-04-23 21:17:47] [info] ----------------------------------------------------
+[2023-04-23 21:17:47] [info] Coverage binary generated in file: C:\Users\Senpai\AppData\Local\Temp\lsp2gsgx.lel
+[2023-04-23 21:17:47] [info] ----------------------------------------------------

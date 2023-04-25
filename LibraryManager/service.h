@@ -14,14 +14,14 @@ public:
 	/// </summary>
 	/// <param name="books"> Repository </param>
 	/// <param name="val"> Validator </param>
-	Service(Repository& books, Validator& val) : repo{ books }, val{ val } {
+	Service(Repository& books, Validator& val) noexcept: repo{ books }, val{ val } {
 	};
 
 	/// <summary>
 	/// Returns the list of books
 	/// </summary>
 	/// <returns> vector<Book> </returns>
-	const std::vector<Book> getAllService() const;
+	const vector<Book> getAllService() const;
 
 	/// <summary>
 	/// Searches the book with the given title and author and returns its position in the list
@@ -65,59 +65,59 @@ public:
 	void removeService(const std::string& title, const std::string& author);
 
 	/// <summary>
-	/// Searches the book with the given title in the list and returns it
+	/// Searches the book with the given title and author in the list and returns it
 	/// </summary>
 	/// <param name="title"> string </param>
 	/// <param name="author"> string </param>
 	/// <returns> Book </returns>
 	/// <raises> ServiceError, if the book doesn't exist </raises>
-	const Book& searchByTitle(const std::string& title, const std::string& author) const;
+	const Book& searchByTitleAuthor(const std::string& title, const std::string& author) const;
 
 	/// <summary>
 	/// Filters the list of books by the given parameter
 	/// </summary>
 	/// <param name="filterCond"> function </param>
 	/// <returns> vector<Book> </returns>
-	std::vector<Book> standardFilter(std::function <bool(const Book&)> filterCond);
+	vector<Book> standardFilter(std::function <bool(const Book&)> filterCond);
 
 	/// <summary>
 	/// Filters the list of books by the given year
 	/// </summary>
 	/// <param name="year"> T </param>
 	/// <returns> vector<Book> </returns>
-	std::vector<Book> yearFilter(const int year);
+	vector<Book> yearFilter(const int year);
 
 	/// <summary>
 	/// Filters the list of books by the given title
 	/// </summary>
 	/// <param name="title"> string </param>
 	/// <returns> vector<Book> </returns>
-	std::vector<Book> titleFilter(const std::string& title);
+	vector<Book> titleFilter(const std::string& title);
 
 	/// <summary>
 	/// Sorts the list of books, depending on the compare function (lessThan)
 	/// </summary>
 	/// <param name="lessThan"> function </param>
 	/// <returns> vector<Book> </returns>
-	std::vector<Book> standardSort(bool(*lessThan)(const Book& b1, const Book& b2));
+	vector<Book> standardSort(bool(*lessThan)(const Book& b1, const Book& b2));
 
 	/// <summary>
 	/// Sorts the list of books by their titles
 	/// </summary>
 	/// <returns> vector<Book> </returns>
-	std::vector<Book> titleSort();
+	vector<Book> titleSort();
 
 	/// <summary>
 	/// Sorts the list of books by their author
 	/// </summary>
 	/// <returns> vector<Book> </returns>
-	std::vector<Book> authorSort();
+	vector<Book> authorSort();
 
 	/// <summary>
 	/// Sorts the list of books by their year of release and, if equal, by their genre
 	/// </summary>
 	/// <returns></returns>
-	std::vector<Book> yearGenreSort();
+	vector<Book> yearGenreSort();
 };
 
 void testAdd();

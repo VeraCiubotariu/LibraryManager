@@ -32,7 +32,7 @@ void testValidator() {
 		val.validateBook(b);
 		assert(false);
 	}
-	catch (const ValidationError& error) {
+	catch (ValidationError error) {
 		assert(true);
 	}
 
@@ -41,7 +41,7 @@ void testValidator() {
 		val.validateBook(c);
 		assert(false);
 	}
-	catch (const ValidationError& error) {
+	catch (ValidationError error) {
 		assert(true);
 	}
 
@@ -50,7 +50,7 @@ void testValidator() {
 		val.validateBook(d);
 		assert(false);
 	}
-	catch (const ValidationError& error) {
+	catch (ValidationError error) {
 		assert(true);
 	}
 
@@ -59,7 +59,7 @@ void testValidator() {
 		val.validateBook(e);
 		assert(false);
 	}
-	catch (const ValidationError& error) {
+	catch (ValidationError error) {
 		assert(true);
 	}
 }

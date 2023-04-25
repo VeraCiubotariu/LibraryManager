@@ -33,6 +33,15 @@
     <ClInclude Include="errors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="myVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="repositoryBasket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serviceBasket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -51,6 +60,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="validator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="serviceBasket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

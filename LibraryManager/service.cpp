@@ -1,20 +1,32 @@
 #include "service.h"
 #include <assert.h>
-#include <typeinfo>
 #include <iostream>
 #include <string.h>
 #include "errors.h"
+#include <algorithm>
 
 int Service::searchPos(const std::string& title, const std::string& author) const {
-	std::vector<Book> books = repo.getAll();
+	vector<Book> books = repo.getAll();
 
-	for (int i = 0; i < books.size(); i++) {
-		if (books[i].getTitle() == title && books[i].getAuthor() == author) {
-			return i;
+//	for (int i = 0; i < books.size(); i++) {
+//		if (books[i].getTitle() == title && books[i].getAuthor() == author) {
+//			return i;
+//		}
+
+	auto iterator =  std::find_if(books.begin(), books.end(), [=](const Book& book) {
+		if (book.getTitle() == title && book.getAuthor() == author) {
+			return 1;
 		}
-	}
+		return 0;
+		});
 
-	throw(ServiceError("Carte inexistenta!\n"));
+    if (iterator == books.end()) {
+	    throw(ServiceError("Carte inexistenta!\n"));
+    }
+
+	else {
+		return iterator - books.begin();
+	}
 }
 
 void Service::addService(const std::string& title, const std::string& author, const std::string& genre, const int year) {
@@ -23,10 +35,10 @@ void Service::addService(const std::string& title, const std::string& author, co
 	bool existent = false;
 
 	try {
-		searchByTitle(title, author);
+		searchByTitleAuthor(title, author);
 		existent = true;
 	}
-	catch (const ServiceError& error) {
+	catch (ServiceError error) {
 		repo.add(book);
 	}
 
@@ -36,81 +48,86 @@ void Service::addService(const std::string& title, const std::string& author, co
 
 }
 
-const std::vector<Book> Service::getAllService() const {
+const vector<Book> Service::getAllService() const {
 	return this->repo.getAll();
 }
 
 void Service::modifyService(const std::string& oldTitle, const std::string& oldAuthor, const std::string& newTitle, const std::string& newAuthor, const std::string& newGenre, const int newYear) {
 	Book newBook = Book(newTitle, newAuthor, newGenre, newYear);
 	val.validateBook(newBook);
-	searchByTitle(oldTitle, oldAuthor);
+	searchByTitleAuthor(oldTitle, oldAuthor);
 
 	repo.modify(searchPos(oldTitle, oldAuthor), newBook);
 }
 
 void Service::removeService(const std::string& title, const std::string& author) {
-	searchByTitle(title, author);
+	searchByTitleAuthor(title, author);
 	repo.remove(searchPos(title, author));
 }
 
-const Book& Service::searchByTitle(const std::string& title, const std::string& author) const {
+const Book& Service::searchByTitleAuthor(const std::string& title, const std::string& author) const {
 	return repo.getBook(searchPos(title, author));
 }
 
-std::vector<Book> Service::standardFilter(std::function<bool(const Book&)> filterCond) {
+vector<Book> Service::standardFilter(std::function<bool(const Book&)> filterCond) {
 	auto books = repo.getAll();
-	std::vector<Book> res;
+	vector<Book> res(books.size());
 
-	for (int i = 0; i < books.size(); i++) {
-		if (filterCond(books[i])) {
-			res.push_back(books[i]);
-		}
-	}
+//	for (int i = 0; i < books.size(); i++) {
+//		if (filterCond(books[i])) {
+//			res.push_back(books[i]);
+//		}
+//	}
+
+	auto iterator = std::copy_if(books.begin(), books.end(), res.begin(), filterCond);
+	res.resize(iterator - res.begin());
 
 	return res;
 }
 
-std::vector<Book> Service::yearFilter(const int year) {
+vector<Book> Service::yearFilter(const int year) {
 	return standardFilter([=](const Book& book) {
 		return book.getYear() == year;
 		});
 }
 
-std::vector<Book> Service::titleFilter(const std::string& title){
+vector<Book> Service::titleFilter(const std::string& title){
 	return standardFilter([=](const Book& book) {
 		return book.getTitle() == title;
 		});
 }
 
-std::vector<Book> Service::standardSort(bool(*lessThan)(const Book& b1, const Book& b2)) {
+vector<Book> Service::standardSort(bool(*lessThan)(const Book& b1, const Book& b2)) {
 	auto books = repo.getAll();
 
-	for (int i = 0; i < books.size() - 1; i++) {
-		for (int j = i + 1; j < books.size(); j++) {
-			if (lessThan(books[j], books[i])) {
-				auto aux = books[i];
-				books[i] = books[j];
-				books[j] = aux;
-			}
-		}
-	}
+//	for (int i = 0; i < books.size() - 1; i++) {
+//		for (int j = i + 1; j < books.size(); j++) {
+//			if (lessThan(books[j], books[i])) {
+//				auto aux = books[i];
+//				books[i] = books[j];
+//				books[j] = aux;
+//			}
+//		}
+//	}
+
+	std::sort(books.begin(), books.end(), lessThan);
 
 	return books;
 }
 
-std::vector<Book> Service::titleSort() {
+vector<Book> Service::titleSort() {
 	return standardSort([](const Book& b1, const Book& b2) {
 		return b1.getTitle() < b2.getTitle(); 
 		});
 }
 
-std::vector<Book> Service::authorSort() {
+vector<Book> Service::authorSort() {
 	return standardSort([](const Book& b1, const Book& b2) {
 		return b1.getAuthor() < b2.getAuthor();
 		});
 }
 
-std::vector<Book> Service::yearGenreSort() {
+vector<Book> Service::yearGenreSort() {
 	return standardSort([](const Book& b1, const Book& b2) {
 		if (b1.getYear() == b2.getYear()) {
 			return b1.getGenre() < b2.getGenre();
@@ -141,7 +158,7 @@ void testAdd() {
 		serv.addService("", "", "", -90);
 		assert(false);
 	}
-	catch (const ValidationError& error) {
+	catch (ValidationError error) {
 		assert(true);
 	}
 
@@ -149,7 +166,7 @@ void testAdd() {
 		serv.addService("No longer human", "Osamu Dazai", "Psychological", 1999);
 		assert(false);
 	}
-	catch (const ServiceError& error) {
+	catch (ServiceError error) {
 		assert(true);
 	} 
 }
@@ -169,7 +186,7 @@ void testModify() {
 		serv.modifyService("a", "b", "", "", "", 2033);
 		assert(false);
 	}
-	catch (const ValidationError& error) {
+	catch (ValidationError error) {
 		assert(true);
 	}
 
@@ -177,7 +194,7 @@ void testModify() {
 		serv.modifyService("No longer human", "Osamu Dazai", "a", "b", "c", 1000);
 		assert(false);
 	}
-	catch (const ServiceError& error) {
+	catch (ServiceError error) {
 		assert(true);
 	}
 }
@@ -201,7 +218,8 @@ void testRemove() {
 		serv.removeService("My life", "Nobody");
 		assert(false);
 	}
-	catch (const ServiceError& error) {
+	catch (ServiceError& error) {
+		assert(error.getMessage() == "Carte inexistenta!\n");
 		assert(true);
 	}
 }
@@ -214,14 +232,14 @@ void testSearch() {
 	serv.addService("My life", "Nobody", "Confession", 2001);
 	serv.addService("No longer human", "Osamu Dazai", "Psychological", 1989);
 
-	assert(serv.searchByTitle("My life", "Nobody") == Book("My life", "Nobody", "Confession", 2001));
-	assert(serv.searchByTitle("No longer human", "Osamu Dazai") == Book("No longer human", "Osamu Dazai", "Psychological", 1989));
+	assert(serv.searchByTitleAuthor("My life", "Nobody") == Book("My life", "Nobody", "Confession", 2001));
+	assert(serv.searchByTitleAuthor("No longer human", "Osamu Dazai") == Book("No longer human", "Osamu Dazai", "Psychological", 1989));
 
 	try {
-		serv.searchByTitle("Cool Book", "Not so Cool Author");
+		serv.searchByTitleAuthor("Cool Book", "Not so Cool Author");
 		assert(false);
 	}
-	catch (const ServiceError& error) {
+	catch (ServiceError error) {
 		assert(true);
 	}
 }

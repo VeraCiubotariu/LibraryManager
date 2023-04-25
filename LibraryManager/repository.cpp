@@ -1,6 +1,7 @@
 #include "repository.h"
-#include <vector>
+//#include <vector>
 #include <assert.h>
+#include "errors.h"
 
 void Repository::add(const Book& book) {
 	this->books.push_back(book);
@@ -26,8 +27,25 @@ const Book& Repository::getBook(const int pos) const {
 	return this->books[pos];
 }
 
-std::vector<Book> Repository::getAll() const {
+vector<Book> Repository::getAll() const {
 	return this->books;
+}
+
+const Book& Repository::searchByTitle(const std::string& title) const {
+	auto iterator = std::find_if(books.begin(), books.end(), [=](const Book& book) {
+		if (book.getTitle() == title) {
+			return 1;
+		}
+		return 0;
+		});
+
+	if (iterator == books.end()) {
+		throw RepositoryError("Carte inexistenta!\n");
+	}
+
+	else {
+		return books[iterator - books.begin()];
+	}
 }
 
 void testRepository() {
@@ -43,8 +61,9 @@ void testRepository() {
 	books.add(b);
 	assert(books.booksNumber() == 2);
 	assert(books.getBook(1) == b);
+	assert(books.searchByTitle("Title") == a);
 
-	std::vector<Book> copy = books.getAll();
+	vector<Book> copy = books.getAll();
 	assert(copy[0] == a);
 	assert(copy[1] == b);
 	assert(copy.size() == 2);
@@ -59,5 +78,13 @@ void testRepository() {
 
 	books.remove(0);
 	assert(books.booksNumber() == 0); 
+
+	try {
+		books.searchByTitle("Title");
+		assert(false);
+	}
+	catch (RepositoryError error) {
+		assert(true);
+	}
 }
 

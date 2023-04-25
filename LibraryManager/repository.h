@@ -1,10 +1,12 @@
 #pragma once
 #include <vector>
+using std::vector;
 #include "book.h"
+//#include "myVector.h"
 
 class Repository {
-private:
-	std::vector<Book> books;
+protected:
+	vector<Book> books;
 
 public:
 	/// <summary>
@@ -43,7 +45,15 @@ public:
 	/// Returns all the books from the list
 	/// </summary>
 	/// <returns> vector<Book> </returns>
-	std::vector<Book> getAll() const;
+	vector<Book> getAll() const;
+
+	/// <summary>
+	/// Returns the book with the given title. Raises exception if the book doesn't exist
+	/// </summary>
+	/// <param name="title"> string </param>
+	/// <returns> Book </returns>
+	/// <raises> RepositoryError, if the book doesn't exist </raises>
+	const Book& searchByTitle(const std::string& title) const;
 };
 
 void testRepository();

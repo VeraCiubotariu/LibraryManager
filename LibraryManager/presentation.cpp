@@ -6,7 +6,8 @@ using std::cin;
 using std::cout;
 
 void UI::printMenu() {
-	cout << "1. Adauga carte\n2. Afiseaza toate cartile\n3. Modifica carte\n4. Sterge carte\n5. Cauta carte\n6. Filtreaza dupa an\n7. Filtreaza dupa nume\n8. Sorteaza dupa titlu\n9. Sorteaza dupa autor\na. Sorteaza dupa an + gen\n0. Iesire\n\nIntrodu comanda: ";
+	cout << "\nCarti in cos: " << basket.size() << "\n\n";
+	cout << "1. Adauga carte\n2. Afiseaza toate cartile\n3. Modifica carte\n4. Sterge carte\n5. Cauta carte\n6. Filtreaza dupa an\n7. Filtreaza dupa nume\n8. Sorteaza dupa titlu\n9. Sorteaza dupa autor\na. Sorteaza dupa an + gen\nb. Adauga in cos\nc. Goleste cos\nd. Genereaza cos\ne. Exporta cos\n0. Iesire\n\nIntrodu comanda: ";
 }
 
 void UI::addUI() {
@@ -33,9 +34,9 @@ void UI::addUI() {
 	}
 }
 
-void UI::printAll(const std::vector<Book>& books) {
-	for (int i = 0; i < books.size(); i++) {
-		cout << books[i].toString();
+void UI::printAll(const vector<Book>& books) {
+	for (auto book:books) {
+		cout << book.toString();
 	}
 }
 
@@ -96,7 +97,7 @@ void UI::searchUI() {
 	cin >> author;
 
 	try {
-		cout << serv.searchByTitle(title, author).toString();
+		cout << serv.searchByTitleAuthor(title, author).toString();
 	}
 	catch (StandardError& error) {
 		cout << error.getMessage() << "\n";
@@ -136,6 +137,56 @@ void UI::yearGenreSortUI() {
 	printAll(sortedList);
 }
 
+void UI::addBasketUI() {
+	std::string title;
+	cout << "Titlu: ";
+	cin >> title;
+
+	try {
+		basket.addInBasket(title);
+		printAll(basket.getAll());
+	}
+	catch (RepositoryError error) {
+		cout << error.getMessage();
+	}
+}
+
+void UI::clearBasketUI() {
+	basket.clearBasket();
+}
+
+void UI::generateBasketUI() {
+	cout << "Numar de carti de generat: ";
+	int nr;
+	cin >> nr;
+
+	try {
+		basket.generateBasket(nr);
+		printAll(basket.getAll());
+	}
+	catch (ServiceError error) {
+		cout << error.getMessage();
+	}
+}
+
+void UI::exportBasketUI() {
+	std::string fileName;
+	cout << "Numele fisierului: ";
+	cin >> fileName;
+
+	int fileType;
+	cout << "[0]CVS [1]HTML: ";
+	cin >> fileType;
+
+	try {
+		basket.exportBasket(fileName, fileType);
+		cout << "Cos exportat cu succes!\n";
+	}
+	catch (ServiceError error) {
+		cout << error.getMessage();
+	}
+}
+
 void UI::runUI() {
 	bool running = true;
 	while (running) {
@@ -173,6 +224,18 @@ void UI::runUI() {
 			break;
 		case 'a':
 			yearGenreSortUI();
+			break;
+		case 'b':
+			addBasketUI();
+			break;
+		case 'c':
+			clearBasketUI();
+			break;
+		case 'd':
+			generateBasketUI();
+			break;
+		case 'e':
+			exportBasketUI();
 			break;
 		case '0':
 			running = false;
