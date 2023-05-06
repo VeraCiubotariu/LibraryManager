@@ -2,7 +2,7 @@
 #include "validator.h"
 #define _CRTDBG_MAP_ALLOC
 #include <vector>
-//#include "myVector.h"
+#include "myVector.h"
 #include <assert.h>
 #include <iostream>
 
@@ -88,12 +88,13 @@ void testAll() {
 
 void runTests() {
 	//teste vector
-	testAll<vector<Book>>();
+	testAll<MyVector<Book>>();
 
 	testValidator();
 
 	testBook();
-	testRepository();
+	testInMemoryRepo();
+	testFileRepo();
 
 	testAdd();
 	testModify();
@@ -101,7 +102,11 @@ void runTests() {
 	testSearch();
 	testFilters();
 	testSort(); 
+	testGenreMap();
+	testExportBooks();
+	testUndo();
 
+	//teste basket
 	testAddClearBasket();
 	testGenerateBasket();
 	testExportBasket();
@@ -111,17 +116,19 @@ int main() {
 	runTests();
 
 	{
-		Repository repo = Repository();
+		TList undoList;
+		Repository* repo = new InMemoryRepo();
 		RepoBasket repoBasket = RepoBasket();
 
 		Validator val = Validator();
 
-		Service serv = Service(repo, val);
+		Service serv = Service(undoList, repo, val);
 		ServiceBasket servBasket = ServiceBasket(repoBasket, repo);
 
 		UI ui = UI(serv, servBasket);
 
-		ui.runUI();
+	//	ui.runUI();
+		delete repo;
 	}
 
 	_CrtDumpMemoryLeaks();

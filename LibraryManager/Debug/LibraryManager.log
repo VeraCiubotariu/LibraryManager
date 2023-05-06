@@ -1,2 +1,3 @@
-﻿  main.cpp
+﻿  FileRepo.cpp
+C:\OOP\LibraryManager\LibraryManager\FileRepo.cpp(77,20): warning C4018: '<': signed/unsigned mismatch
   LibraryManager.vcxproj -> C:\OOP\LibraryManager\Debug\LibraryManager.exe

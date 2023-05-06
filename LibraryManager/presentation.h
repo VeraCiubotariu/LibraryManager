@@ -84,6 +84,18 @@ public:
 	/// </summary>
 	void exportBasketUI();
 
+	void genreMapUI();
+
+	/// <summary>
+	/// Exports all the books in the library
+	/// </summary>
+	void exportBooksUI();
+
+	/// <summary>
+	/// Undos the last operation and prints the list of books
+	/// </summary>
+	void undoUI();
+
 	/// <summary>
 	/// Prints all the books
 	/// </summary>

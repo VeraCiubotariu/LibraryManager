@@ -5,7 +5,7 @@ template<typename ElemType>
 class IteratorVector;
 
 template<typename ElemType>
-class vector {
+class MyVector {
 private:
 	ElemType* elems;
 	int len;
@@ -15,7 +15,7 @@ public:
 	/// <summary>
 	/// The constructor of the class
 	/// </summary>
-	vector() {
+	MyVector() {
 		elems = new ElemType[2];
 		len = 0;
 		cap = 2;
@@ -24,7 +24,7 @@ public:
 	/// <summary>
 	/// The destructor of the class
 	/// </summary>
-	~vector() {
+	~MyVector() {
 		delete[] elems;
 	}
 
@@ -32,7 +32,7 @@ public:
 	/// The copy constructor of the class
 	/// </summary>
 	/// <param name="v"></param>
-	vector(const vector& v) {
+	MyVector(const MyVector& v) {
 		this->cap = v.cap;
 		this->len = v.len;
 		this->elems = new ElemType[v.cap];
@@ -46,7 +46,7 @@ public:
 	/// The move constructor of the class
 	/// </summary>
 	/// <param name="ot"> vector&& </param>
-	vector(vector&& ot) {
+	MyVector(MyVector&& ot) {
 		elems = ot.elems;
 		len = ot.len;
 		cap = ot.cap;
@@ -61,7 +61,7 @@ public:
 	/// </summary>
 	/// <param name="ot"> vector&& </param>
 	/// <returns> vector& </returns>
-	vector& operator=(vector&& ot) {
+	MyVector& operator=(MyVector&& ot) {
 		if (this == &ot) {
 			return *this;
 		}
@@ -81,7 +81,7 @@ public:
 	/// </summary>
 	/// <param name="ot"> vector </param>
 	/// <returns> vector </returns>
-	vector& operator=(const vector& ot) {
+	MyVector& operator=(const MyVector& ot) {
 		if (this == &ot) {
 			return *this;
 		}
@@ -170,13 +170,13 @@ public:
 template<typename ElemType>
 class IteratorVector {
 private:
-	vector<ElemType> v;
+	MyVector<ElemType> v;
 	int pos = 0;
 public:
 	/// <summary>
 	/// The constructor of the class
 	/// </summary>
-	IteratorVector(const vector<ElemType>& v) {
+	IteratorVector(const MyVector<ElemType>& v) {
 		this->v = v;
 	}
 
@@ -185,7 +185,7 @@ public:
 	/// </summary>
 	/// <param name="v"> vector& </param>
 	/// <param name="pos"> int </param>
-	IteratorVector(const vector<ElemType>& v, int pos) {
+	IteratorVector(const MyVector<ElemType>& v, int pos) {
 		this->v = v;
 		this->pos = pos;
 	}

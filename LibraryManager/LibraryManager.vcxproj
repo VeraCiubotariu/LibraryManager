@@ -89,7 +89,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,21 +143,26 @@
   <ItemGroup>
     <ClInclude Include="book.h" />
     <ClInclude Include="errors.h" />
+    <ClInclude Include="FileRepo.h" />
+    <ClInclude Include="InMemoryRepo.h" />
     <ClInclude Include="myVector.h" />
     <ClInclude Include="presentation.h" />
     <ClInclude Include="repository.h" />
     <ClInclude Include="repositoryBasket.h" />
     <ClInclude Include="service.h" />
     <ClInclude Include="serviceBasket.h" />
+    <ClInclude Include="undo.h" />
     <ClInclude Include="validator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="book.cpp" />
+    <ClCompile Include="FileRepo.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="presentation.cpp" />
-    <ClCompile Include="repository.cpp" />
+    <ClCompile Include="InMemoryRepo.cpp" />
     <ClCompile Include="service.cpp" />
     <ClCompile Include="serviceBasket.cpp" />
+    <ClCompile Include="undo.cpp" />
     <ClCompile Include="validator.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

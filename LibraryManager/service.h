@@ -1,11 +1,18 @@
 #pragma once
-#include "repository.h"
+#include "InMemoryRepo.h"
+#include "FileRepo.h"
 #include "validator.h"
 #include <functional>
+#include <map>
+#include <stack>
+#include "undo.h"
+using std::map;
+typedef std::stack<UndoAction*> TList;
 
 class Service {
 private:
-	Repository& repo;
+	TList& undoList;
+	Repository* repo;
 	Validator& val;
 
 public:
@@ -14,8 +21,13 @@ public:
 	/// </summary>
 	/// <param name="books"> Repository </param>
 	/// <param name="val"> Validator </param>
-	Service(Repository& books, Validator& val) noexcept: repo{ books }, val{ val } {
+	Service(TList& undoList, Repository* books, Validator& val) noexcept : repo{ books }, val{ val }, undoList{ undoList }{
 	};
+
+	/// <summary>
+	/// The destructor of the class
+	/// </summary>
+	~Service();
 
 	/// <summary>
 	/// Returns the list of books
@@ -118,6 +130,23 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	vector<Book> yearGenreSort();
+
+	map<std::string, vector<Book>> genreMap();
+
+	/// <summary>
+	/// Exports all the books into fileName.cvs if fileType = 0, 
+	///                    or into fileName.html if fileType = 1
+	/// </summary>
+	/// <param name="fileName"> string </param>
+	/// <param name="fileType"> int </param>
+	/// <raises> ServiceError, if fileType != 0 or fileType != 1 </raises>
+	void exportBooks(std::string fileName, const int fileType);
+
+	/// <summary>
+	/// Undos the last operation
+	/// </summary>
+	/// <raises> ServiceError, if the undoList is empty </raises>
+	void undoService();
 };
 
 void testAdd();
@@ -126,3 +155,6 @@ void testRemove();
 void testSearch();
 void testFilters();
 void testSort();
+void testGenreMap();
+void testExportBooks();
+void testUndo();

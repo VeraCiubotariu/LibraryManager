@@ -6,7 +6,7 @@
 #include <fstream>
 
 void ServiceBasket::addInBasket(const std::string& title) {
-	Book book = repoBooks.searchByTitle(title);
+	Book book = repoBooks->searchByTitle(title);
 	items.add(book);
 }
 
@@ -23,7 +23,7 @@ vector<Book> ServiceBasket::getAll() const {
 }
 
 void ServiceBasket::generateBasket(const int number) {
-	if (repoBooks.booksNumber() == 0) {
+	if (repoBooks->booksNumber() == 0) {
 		throw(ServiceError("Nu exista carti in biblioteca!\n"));
 	}
 
@@ -33,10 +33,10 @@ void ServiceBasket::generateBasket(const int number) {
 
 	for (int i = 0; i < number; i++) {
 		std::mt19937 mt{ std::random_device{}() };
-		std::uniform_int_distribution<> dist(0, repoBooks.booksNumber() - 1);
+		std::uniform_int_distribution<> dist(0, repoBooks->booksNumber() - 1);
 		int randNr = dist(mt);
 
-		items.add(repoBooks.getBook(randNr));
+		items.add(repoBooks->getBook(randNr));
 	}
 }
 
@@ -70,9 +70,9 @@ void testAddClearBasket() {
 	Book a = Book("Wanna go home", "Nobody", "Confession", 2001);
 	Book b = Book("No longer human", "Osamu Dazai", "Psychological", 1989);
 
-	auto repo = Repository();
-	repo.add(a);
-	repo.add(b);
+	Repository* repo = new InMemoryRepo();
+	repo->add(a);
+	repo->add(b);
 
 	auto serv = ServiceBasket(basket, repo);
 
@@ -92,6 +92,8 @@ void testAddClearBasket() {
 
 	serv.clearBasket();
 	assert(serv.size() == 0);
+
+	delete repo;
 }
 
 void testGenerateBasket() {
@@ -104,12 +106,12 @@ void testGenerateBasket() {
 	Book d = Book("No more donuts", "Marge Simpson", "Thriller", 2001);
 	Book e = Book("My wife", "Mary Poppins", "Fantasy", 1999);
 
-	auto repo = Repository();
-	repo.add(a);
-	repo.add(b);
-	repo.add(c);
-	repo.add(d);
-	repo.add(e);
+	auto repo = new InMemoryRepo();
+	repo->add(a);
+	repo->add(b);
+	repo->add(c);
+	repo->add(d);
+	repo->add(e);
 
 	auto serv = ServiceBasket(basket, repo);
 	serv.generateBasket(9);
@@ -131,7 +133,7 @@ void testGenerateBasket() {
 	}
 
 	for (int i = 0; i < 5; i++) {
-		repo.remove(0);
+		repo->remove(0);
 	}
 
 	try {
@@ -142,6 +144,7 @@ void testGenerateBasket() {
 		assert(true);
 	}
 
+	delete repo;
 }
 
 void testExportBasket() {
@@ -149,9 +152,9 @@ void testExportBasket() {
 	Book a = Book("Wanna go home", "Nobody", "Confession", 2001);
 	Book b = Book("No longer human", "Osamu Dazai", "Psychological", 1989);
 
-	auto repo = Repository();
-	repo.add(a);
-	repo.add(b);
+	auto repo = new InMemoryRepo();
+	repo->add(a);
+	repo->add(b);
 
 	auto serv = ServiceBasket(basket, repo);
 
@@ -182,4 +185,6 @@ void testExportBasket() {
 	catch (ServiceError error) {
 		assert(true);
 	}
-}
+
+	delete repo;
+} 

@@ -7,7 +7,7 @@ using std::cout;
 
 void UI::printMenu() {
 	cout << "\nCarti in cos: " << basket.size() << "\n\n";
-	cout << "1. Adauga carte\n2. Afiseaza toate cartile\n3. Modifica carte\n4. Sterge carte\n5. Cauta carte\n6. Filtreaza dupa an\n7. Filtreaza dupa nume\n8. Sorteaza dupa titlu\n9. Sorteaza dupa autor\na. Sorteaza dupa an + gen\nb. Adauga in cos\nc. Goleste cos\nd. Genereaza cos\ne. Exporta cos\n0. Iesire\n\nIntrodu comanda: ";
+	cout << "1. Adauga carte\n2. Afiseaza toate cartile\n3. Modifica carte\n4. Sterge carte\n5. Cauta carte\n6. Filtreaza dupa an\n7. Filtreaza dupa nume\n8. Sorteaza dupa titlu\n9. Sorteaza dupa autor\na. Sorteaza dupa an + gen\nb. Adauga in cos\nc. Goleste cos\nd. Genereaza cos\ne. Exporta cos\nf. Afiseaza cartile dupa gen\ng. Exporta toate cartile din biblioteca\ni. Undo\n0. Iesire\n\nIntrodu comanda: ";
 }
 
 void UI::addUI() {
@@ -148,7 +148,7 @@ void UI::addBasketUI() {
 	}
 	catch (RepositoryError error) {
 		cout << error.getMessage();
-	}
+	} 
 }
 
 void UI::clearBasketUI() {
@@ -166,7 +166,7 @@ void UI::generateBasketUI() {
 	}
 	catch (ServiceError error) {
 		cout << error.getMessage();
-	}
+	} 
 }
 
 void UI::exportBasketUI() {
@@ -183,6 +183,46 @@ void UI::exportBasketUI() {
 		cout << "Cos exportat cu succes!\n";
 	}
 	catch (ServiceError error) {
+		cout << error.getMessage();
+	}
+}
+
+void UI::genreMapUI() {
+	auto map = serv.genreMap();
+	for (auto el : map) {
+		auto key = el.first;
+		auto books = el.second;
+
+		cout << "GEN - " << key << "\n\n";
+		printAll(books);
+		cout << "_____________________________\n";
+	}
+}
+
+void UI::exportBooksUI() {
+	std::string fileName;
+	cout << "Numele fisierului: ";
+	cin >> fileName;
+
+	int fileType;
+	cout << "[0]CVS [1]HTML: ";
+	cin >> fileType;
+
+	try {
+		serv.exportBooks(fileName, fileType);
+		cout << "Carti exportate cu succes!\n";
+	}
+	catch (ServiceError error) {
+		cout << error.getMessage();
+	}
+}
+
+void UI::undoUI() {
+	try {
+		serv.undoService();
+		printAll(serv.getAllService());
+	}
+	catch (ServiceError& error) {
 		cout << error.getMessage();
 	}
 }
@@ -236,6 +276,15 @@ void UI::runUI() {
 			break;
 		case 'e':
 			exportBasketUI();
+			break;
+		case 'f':
+			genreMapUI();
+			break;
+		case 'g':
+			exportBooksUI();
+			break;
+		case 'i':
+			undoUI();
 			break;
 		case '0':
 			running = false;

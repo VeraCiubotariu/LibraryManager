@@ -42,6 +42,15 @@
     <ClInclude Include="serviceBasket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="undo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InMemoryRepo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileRepo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -53,7 +62,7 @@
     <ClCompile Include="service.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="repository.cpp">
+    <ClCompile Include="InMemoryRepo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="presentation.cpp">
@@ -63,6 +72,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="serviceBasket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="undo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileRepo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

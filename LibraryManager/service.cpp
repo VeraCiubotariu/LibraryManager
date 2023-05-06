@@ -1,12 +1,21 @@
 #include "service.h"
 #include <assert.h>
 #include <iostream>
+#include <fstream>
 #include <string.h>
 #include "errors.h"
 #include <algorithm>
 
+Service::~Service() {
+	while (!undoList.empty()) {
+		UndoAction* ptr = undoList.top();
+		delete ptr;
+		undoList.pop();
+	}
+}
+
 int Service::searchPos(const std::string& title, const std::string& author) const {
-	vector<Book> books = repo.getAll();
+	vector<Book> books = repo->getAll();
 
 //	for (int i = 0; i < books.size(); i++) {
 //		if (books[i].getTitle() == title && books[i].getAuthor() == author) {
@@ -39,7 +48,8 @@ void Service::addService(const std::string& title, const std::string& author, co
 		existent = true;
 	}
 	catch (ServiceError error) {
-		repo.add(book);
+		repo->add(book);
+		undoList.push(new UndoAdd{ repo, book });
 	}
 
 	if (existent) {
@@ -49,29 +59,34 @@ void Service::addService(const std::string& title, const std::string& author, co
 }
 
 const vector<Book> Service::getAllService() const {
-	return this->repo.getAll();
+	return this->repo->getAll();
 }
 
 void Service::modifyService(const std::string& oldTitle, const std::string& oldAuthor, const std::string& newTitle, const std::string& newAuthor, const std::string& newGenre, const int newYear) {
 	Book newBook = Book(newTitle, newAuthor, newGenre, newYear);
+	Book oldBook = searchByTitleAuthor(oldTitle, oldAuthor);
 	val.validateBook(newBook);
 	searchByTitleAuthor(oldTitle, oldAuthor);
 
-	repo.modify(searchPos(oldTitle, oldAuthor), newBook);
+	repo->modify(searchPos(oldTitle, oldAuthor), newBook);
+	undoList.push(new UndoModify{ repo, newBook, oldBook });
 }
 
 void Service::removeService(const std::string& title, const std::string& author) {
 	searchByTitleAuthor(title, author);
-	repo.remove(searchPos(title, author));
+	auto book = searchByTitleAuthor(title, author);
+
+	repo->remove(searchPos(title, author));
+	undoList.push(new UndoRemove{ repo, book });
 }
 
 const Book& Service::searchByTitleAuthor(const std::string& title, const std::string& author) const {
-	return repo.getBook(searchPos(title, author));
+	return repo->getBook(searchPos(title, author));
 }
 
 vector<Book> Service::standardFilter(std::function<bool(const Book&)> filterCond) {
-	auto books = repo.getAll();
-	vector<Book> res(books.size());
+	auto books = repo->getAll();
+	vector<Book> res;
 
 //	for (int i = 0; i < books.size(); i++) {
 //		if (filterCond(books[i])) {
@@ -79,8 +94,8 @@ vector<Book> Service::standardFilter(std::function<bool(const Book&)> filterCond
 //		}
 //	}
 
-	auto iterator = std::copy_if(books.begin(), books.end(), res.begin(), filterCond);
-	res.resize(iterator - res.begin());
+	auto iterator = std::copy_if(books.begin(), books.end(), std::back_inserter(res), filterCond);
+	//res.resize(iterator - res.begin());
 
 	return res;
 }
@@ -98,7 +113,7 @@ vector<Book> Service::titleFilter(const std::string& title){
 }
 
 vector<Book> Service::standardSort(bool(*lessThan)(const Book& b1, const Book& b2)) {
-	auto books = repo.getAll();
+	auto books = repo->getAll();
 
 //	for (int i = 0; i < books.size() - 1; i++) {
 //		for (int j = i + 1; j < books.size(); j++) {
@@ -137,20 +152,68 @@ vector<Book> Service::yearGenreSort() {
 		});
 }
 
-void testAdd() {
-	Repository repo = Repository();
-	Validator val = Validator();
-	Service serv = Service(repo, val);
+map<std::string, vector<Book>> Service::genreMap() {
+	map<std::string, vector<Book>> res;
+	auto books = repo->getAll();
+	vector<Book> emptyVector;
 
-	assert(repo.booksNumber() == 0);
+	for (auto book : books) {
+		auto key = book.getGenre();
+		res[key].push_back(book);
+	}
+
+	return res;
+}
+
+void Service::exportBooks(std::string fileName, const int fileType) {
+	if (fileType == 0) {
+		fileName += ".cvs";
+	}
+
+	else if (fileType == 1) {
+		fileName += ".html";
+	}
+
+	else {
+		throw(ServiceError("Tip fisier invalid!\n"));
+	}
+
+	std::ofstream fout(fileName);
+
+	auto books = repo->getAll();
+	for (auto book : books) {
+		fout << book.toString() << "\n";
+	}
+
+	fout.close();
+}
+
+void Service::undoService() {
+	if (undoList.empty()) {
+		throw ServiceError("Nu mai exista operatii!\n");
+	}
+
+	UndoAction* undo = undoList.top();
+	undo->doUndo();
+	delete undo;
+	undoList.pop();
+}
+
+void testAdd() {
+	TList undoList;
+	Repository* repo = new InMemoryRepo();
+	Validator val = Validator();
+	Service serv = Service(undoList, repo, val);
+
+	assert(repo->booksNumber() == 0);
 
 	serv.addService("My life", "Nobody", "Confession", 2001);
-	assert(repo.booksNumber() == 1);
-	assert(repo.getBook(0).getTitle() == "My life");
+	assert(repo->booksNumber() == 1);
+	assert(repo->getBook(0).getTitle() == "My life");
 
 	serv.addService("No longer human", "Osamu Dazai", "Psychological", 1989);
-	assert(repo.booksNumber() == 2);
-	assert(repo.getBook(1).getYear() == 1989);
+	assert(repo->booksNumber() == 2);
+	assert(repo->getBook(1).getYear() == 1989);
 
 	assert(serv.getAllService().size() == 2);
 
@@ -169,18 +232,21 @@ void testAdd() {
 	catch (ServiceError error) {
 		assert(true);
 	} 
+
+	delete repo;
 }
 
 void testModify() {
-	Repository repo = Repository();
+	TList undoList;
+	Repository* repo = new InMemoryRepo();
 	Validator val = Validator();
-	Service serv = Service(repo, val);
+	Service serv = Service(undoList, repo, val);
 
 	serv.addService("My life", "Nobody", "Confession", 2001);
 	serv.addService("No longer human", "Osamu Dazai", "Psychological", 1989);
 
 	serv.modifyService("No longer human", "Osamu Dazai", "a", "b", "c", 1000);
-	assert(repo.getBook(1) == Book("a", "b", "c", 1000));
+	assert(repo->getBook(1) == Book("a", "b", "c", 1000));
 
 	try {
 		serv.modifyService("a", "b", "", "", "", 2033);
@@ -197,22 +263,25 @@ void testModify() {
 	catch (ServiceError error) {
 		assert(true);
 	}
+
+	delete repo;
 }
 
 void testRemove() {
-	Repository repo = Repository();
+	TList undoList;
+	Repository* repo = new InMemoryRepo();
 	Validator val = Validator();
-	Service serv = Service(repo, val);
+	Service serv = Service(undoList, repo, val);
 
 	serv.addService("My life", "Nobody", "Confession", 2001);
 	serv.addService("No longer human", "Osamu Dazai", "Psychological", 1989);
 
 	serv.removeService("My life", "Nobody");
-	assert(repo.booksNumber() == 1);
-	assert(repo.getBook(0).getTitle() == "No longer human");
+	assert(repo->booksNumber() == 1);
+	assert(repo->getBook(0).getTitle() == "No longer human");
 
 	serv.removeService("No longer human", "Osamu Dazai");
-	assert(repo.booksNumber() == 0); 
+	assert(repo->booksNumber() == 0); 
 
 	try {
 		serv.removeService("My life", "Nobody");
@@ -222,12 +291,15 @@ void testRemove() {
 		assert(error.getMessage() == "Carte inexistenta!\n");
 		assert(true);
 	}
+
+	delete repo;
 }
 
 void testSearch() {
-	Repository repo = Repository();
+	TList undoList;
+	Repository* repo = new InMemoryRepo();
 	Validator val = Validator();
-	Service serv = Service(repo, val);
+	Service serv = Service(undoList, repo, val);
 
 	serv.addService("My life", "Nobody", "Confession", 2001);
 	serv.addService("No longer human", "Osamu Dazai", "Psychological", 1989);
@@ -242,12 +314,15 @@ void testSearch() {
 	catch (ServiceError error) {
 		assert(true);
 	}
+
+	delete repo;
 }
 
 void testFilters() {
-	Repository repo = Repository();
+	TList undoList;
+	Repository* repo = new InMemoryRepo();
 	Validator val = Validator();
-	Service serv = Service(repo, val);
+	Service serv = Service(undoList, repo, val);
 
 	serv.addService("My life", "Nobody", "Confession", 2001);
 	serv.addService("No longer human", "Osamu Dazai", "Psychological", 1989);
@@ -272,12 +347,15 @@ void testFilters() {
 
 	filteredList = serv.titleFilter("No way");
 	assert(filteredList.size() == 0);
+
+	delete repo;
 }
 
 void testSort() {
-	Repository repo = Repository();
+	TList undoList;
+	Repository* repo = new InMemoryRepo();
 	Validator val = Validator();
-	Service serv = Service(repo, val);
+	Service serv = Service(undoList, repo, val);
 
 	serv.addService("Wanna go home", "Nobody", "Confession", 2001);
 	serv.addService("No longer human", "Osamu Dazai", "Psychological", 1989);
@@ -299,4 +377,101 @@ void testSort() {
 	assert(sortedList[0].getGenre() == "Psychological");
 	assert(sortedList[1].getGenre() == "Fantasy");
 	assert(sortedList[3].getGenre() == "Confession");
+
+	delete repo;
+}
+
+void testGenreMap() {
+	TList undoList;
+	Repository* repo = new InMemoryRepo();
+	Validator val = Validator();
+	Service serv = Service(undoList, repo, val);
+
+	serv.addService("Wanna go home", "Nobody", "Comedy", 2001);
+	serv.addService("No longer human", "Osamu Dazai", "Psychological", 1989);
+	serv.addService("Mr. Bottle", "Mamma Mia", "Comedy", 2001);
+	serv.addService("No more donuts", "Marge Simpson", "Thriller", 2001);
+	serv.addService("My wife", "Mary Poppins", "Comedy", 1999);
+	serv.addService("Great book", "Cool dude", "Psychological", 2021);
+
+	auto map = serv.genreMap();
+	assert(map["Comedy"].size() == 3);
+	assert(map["Psychological"].size() == 2);
+	assert(map["Thriller"].size() == 1);
+
+	delete repo;
+}
+
+void testExportBooks() {
+	TList undoList;
+	Repository* repo = new InMemoryRepo();
+	Validator val = Validator();
+	Service serv = Service(undoList, repo, val);
+
+	serv.addService("Wanna go home", "Nobody", "Confession", 2001);
+	serv.addService("No longer human", "Osamu Dazai", "Psychological", 1989);
+
+	serv.exportBooks("test", 0);
+	std::ifstream fin("test.cvs");
+	std::string word;
+
+	fin >> word >> word;
+	assert(word == "Wanna");
+
+	fin.close();
+
+	serv.exportBooks("test", 1);
+	std::ifstream fin2("test.html");
+
+	fin2 >> word >> word;
+	assert(word == "Wanna");
+
+	fin2.close();
+
+	try {
+		serv.exportBooks("test", 421);
+		assert(false);
+	}
+	catch (ServiceError error) {
+		assert(true);
+	}
+
+	delete repo;
+}
+
+void testUndo() {
+	TList undoList;
+	Repository* repo = new InMemoryRepo();
+	Validator val = Validator();
+	Service serv = Service(undoList, repo, val);
+
+	Book a = Book("Wanna go home", "Nobody", "Comedy", 2001);
+
+	serv.addService("Wanna go home", "Nobody", "Comedy", 2001);
+	
+	serv.addService("No longer human", "Osamu Dazai", "Psychological", 1989);
+	serv.undoService();
+	assert(repo->booksNumber() == 1);
+
+	serv.modifyService("Wanna go home", "Nobody", "Well done, boy", "Mark Fisher", "Drama", 1989);
+	serv.undoService();
+	assert(repo->getBook(0) == a);
+
+	serv.removeService("Wanna go home", "Nobody");
+	serv.undoService();
+	assert(repo->booksNumber() == 1);
+	assert(repo->getBook(0) == a);
+
+	serv.undoService();
+	assert(repo->booksNumber() == 0);
+
+	try {
+		serv.undoService();
+		assert(false);
+	}
+	catch (ServiceError& error) {
+		assert(error.getMessage() == "Nu mai exista operatii!\n");
+	}
+
+	delete repo;
 }

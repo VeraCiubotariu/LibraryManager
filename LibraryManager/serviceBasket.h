@@ -4,7 +4,7 @@
 class ServiceBasket {
 private:
 	RepoBasket& items;
-	Repository& repoBooks;
+	Repository* repoBooks;
 
 public:
 	/// <summary>
@@ -12,7 +12,7 @@ public:
 	/// </summary>
 	/// <param name="items"> RepoBasket </param>
 	/// <param name="repo"> Repository </param>
-	ServiceBasket(RepoBasket& items, Repository& repo) noexcept : items{ items }, repoBooks{ repo }{};
+	ServiceBasket(RepoBasket& items, Repository* repo) noexcept : items{ items }, repoBooks{ repo }{};
 
 	/// <summary>
 	/// Adds the book with the given title in the basket. Raises exception otherwise
@@ -58,4 +58,4 @@ public:
 
 void testAddClearBasket();
 void testGenerateBasket();
-void testExportBasket();
+void testExportBasket(); 
